@@ -138,11 +138,11 @@ http://127.0.0.1:5000
 
 ### IP Reputation Checker
 
-![IP Reputation Tool](screenshots/ip-checker.png)
+![IP Reputation Tool](screenshots/results.png (1))
 
 ### Threat Intelligence Results
 
-![Threat Intelligence Results](screenshots/results.png)
+![Threat Intelligence Results](screenshots/results.png (2))
 
 ---
 
