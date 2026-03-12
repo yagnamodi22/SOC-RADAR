@@ -1,0 +1,8 @@
+flask
+requests
+pandas
+pycountry
+concurrent-log-handler
+python-whois
+dnspython
+aiohttp

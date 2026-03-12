@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PSY9 Radar — Cyber Threat Intelligence Dashboard. Check multiple IP addresses against AbuseIPDB, VirusTotal, and AlienVault OTX.">
+    <title>PSY9 Radar</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="app-header">
+    <div class="header-brand">
+        <img src="{{ url_for('static', filename='assets/logo.png') }}" alt="PSY9 Radar Logo" class="header-logo">
+        <div class="header-title-area">
+            <h1 class="header-title">PSY9 Radar</h1>
+            <p class="header-tagline">Where Intelligence Meets Defense</p>
+        </div>
+    </div>
+    <div class="header-center">
+        <div class="radar-container">
+            <div class="radar-ring radar-ring-1"></div>
+            <div class="radar-ring radar-ring-2"></div>
+            <div class="radar-ring radar-ring-3"></div>
+            <div class="radar-sweep"></div>
+            <div class="radar-dot"></div>
+            <div class="radar-blip radar-blip-1"></div>
+            <div class="radar-blip radar-blip-2"></div>
+            <div class="radar-blip radar-blip-3"></div>
+        </div>
+    </div>
+    <div class="header-right">
+        <span class="header-badge"><i class="bi bi-shield-lock-fill"></i> Security Operations Center</span>
+    </div>
+</header>
+
+<!-- ===================== THREAT COUNTERS ===================== -->
+<div class="threat-counters-bar" style="position:relative;z-index:1;">
+    <div class="counter-card counter-total">
+        <div class="counter-icon"><i class="bi bi-globe2"></i></div>
+        <div class="counter-info">
+            <span class="counter-value" id="cntTotal">0</span>
+            <span class="counter-label">Total IPs Scanned</span>
+        </div>
+    </div>
+    <div class="counter-card counter-danger">
+        <div class="counter-icon"><i class="bi bi-x-octagon-fill"></i></div>
+        <div class="counter-info">
+            <span class="counter-value" id="cntMalicious">0</span>
+            <span class="counter-label">Malicious IPs</span>
+        </div>
+    </div>
+    <div class="counter-card counter-warning">
+        <div class="counter-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <div class="counter-info">
+            <span class="counter-value" id="cntSuspicious">0</span>
+            <span class="counter-label">Suspicious IPs</span>
+        </div>
+    </div>
+    <div class="counter-card counter-success">
+        <div class="counter-icon"><i class="bi bi-check-circle-fill"></i></div>
+        <div class="counter-info">
+            <span class="counter-value" id="cntClean">0</span>
+            <span class="counter-label">Clean IPs</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== DASHBOARD INFO CARDS ===================== -->
+<div class="dashboard-info-cards" style="position:relative;z-index:1;">
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="bi bi-clock-history"></i> Recent IP Investigations
+        </div>
+        <div class="info-card-body" id="recentInvestigations">
+            <div class="info-card-empty"><i class="bi bi-inbox"></i> No investigations yet</div>
+        </div>
+    </div>
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="bi bi-database-fill-gear"></i> Threat Intelligence Sources
+        </div>
+        <div class="info-card-body">
+            <div class="source-item online"><i class="bi bi-circle-fill"></i> AbuseIPDB <span class="source-badge">Active</span></div>
+            <div class="source-item online"><i class="bi bi-circle-fill"></i> VirusTotal <span class="source-badge">Active</span></div>
+            <div class="source-item online"><i class="bi bi-circle-fill"></i> AlienVault OTX <span class="source-badge">Active</span></div>
+        </div>
+    </div>
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="bi bi-activity"></i> System Status
+        </div>
+        <div class="info-card-body">
+            <div class="status-row"><span>Engine</span><span class="status-online"><i class="bi bi-circle-fill"></i> Online</span></div>
+            <div class="status-row"><span>API Gateway</span><span class="status-online"><i class="bi bi-circle-fill"></i> Connected</span></div>
+            <div class="status-row"><span>Last Scan</span><span class="status-time" id="lastScanTime">—</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== DASHBOARD LAYOUT ===================== -->
+<div class="dashboard">
+
+    <!-- -------- Sidebar -------- -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="bi bi-speedometer2"></i>
+            <span>Threat Intel Tools</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active" onclick="showToolSection('ipChecker', this)">
+                <i class="bi bi-shield-check"></i> IP Reputation Checker
+            </li>
+            <li class="sidebar-item" onclick="showToolSection('ipCompareTool', this)">
+                <i class="bi bi-arrow-left-right"></i> IP Comparison Tool
+            </li>
+            <li class="sidebar-item" onclick="showToolSection('ipSingleLineTool', this)">
+                <i class="bi bi-text-paragraph"></i> IP Single-Line Converter
+            </li>
+            <li class="sidebar-item" onclick="showToolSection('domainIntelTool', this)">
+                <i class="bi bi-globe"></i> Domain Intelligence Tool
+            </li>
+            <li class="sidebar-item" onclick="showToolSection('urlIntelTool', this)">
+                <i class="bi bi-link-45deg"></i> URL Intelligence Tool
+            </li>
+            <li class="sidebar-item" onclick="showToolSection('hashIntelTool', this)">
+                <i class="bi bi-fingerprint"></i> File Hash Intelligence Tool
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="main-content container-fluid mt-4 mb-5 px-4" style="position:relative;z-index:1;">
+
+    <!-- Error alert (hidden by default) -->
+    <div id="errorAlert" class="alert-custom mb-3 fade-in" style="display:none;">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="errorMsg"></span>
+    </div>
+
+    <!-- -------- IP Reputation Checker Section -------- -->
+    <div id="ipChecker" class="tool-section">
+
+        <!-- Input Card -->
+        <div class="glass-card mb-4 fade-in">
+            <div class="card-header-custom">
+                <i class="bi bi-terminal-fill"></i> IP Address Input
+            </div>
+
+            <textarea id="ipInput" class="ip-textarea" spellcheck="false"
+                      placeholder="Paste IP addresses here (one per line)&#10;&#10;Example:&#10;8.8.8.8&#10;45.142.122.3&#10;185.220.101.5"></textarea>
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                <button id="checkBtn" class="btn-primary-glow" onclick="checkIPs()">
+                    <i class="bi bi-search"></i> Check IP Reputation
+                </button>
+                <button id="clearBtn" class="btn-outline-custom" onclick="clearAll()">
+                    <i class="bi bi-x-circle"></i> Clear
+                </button>
+                <small class="ms-auto text-muted font-mono" id="ipCount">0 IPs</small>
+            </div>
+        </div>
+
+        <!-- Results Card -->
+        <div class="glass-card fade-in" id="resultsCard" style="display:none;">
+
+        <!-- Toolbar -->
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+            <div class="card-header-custom mb-0">
+                <i class="bi bi-table"></i> Threat Intelligence Results
+            </div>
+
+            <div class="stats-bar ms-auto" id="statsBar"></div>
+
+            <div class="filter-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" class="filter-input" id="filterInput"
+                       placeholder="Filter results…" oninput="filterTable()">
+            </div>
+
+            <button class="btn-outline-custom" id="exportBtn" onclick="exportCSV()">
+                <i class="bi bi-download"></i> Export CSV
+            </button>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs threat-tabs mb-3" id="sourceTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-abuseipdb" data-bs-toggle="tab"
+                        data-bs-target="#panel-abuseipdb" type="button" role="tab"
+                        aria-controls="panel-abuseipdb" aria-selected="true"
+                        onclick="switchSource('abuseipdb')">
+                    AbuseIPDB
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-virustotal" data-bs-toggle="tab"
+                        data-bs-target="#panel-virustotal" type="button" role="tab"
+                        aria-controls="panel-virustotal" aria-selected="false"
+                        onclick="switchSource('virustotal')">
+                    VirusTotal
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-otx" data-bs-toggle="tab"
+                        data-bs-target="#panel-otx" type="button" role="tab"
+                        aria-controls="panel-otx" aria-selected="false"
+                        onclick="switchSource('otx')">
+                    AlienVault OTX
+                </button>
+            </li>
+        </ul>
+
+        <!-- Loading overlay -->
+        <div class="loading-overlay" id="loader">
+            <div class="spinner-ring"></div>
+            <span class="loading-text">Querying threat intelligence sources… <span id="loaderCount"></span></span>
+        </div>
+
+        <div class="tab-content" id="resultsTabContent">
+            <!-- AbuseIPDB -->
+            <div class="tab-pane fade show active" id="panel-abuseipdb" role="tabpanel"
+                 aria-labelledby="tab-abuseipdb">
+                <div class="table-wrapper" id="tableWrapper-abuseipdb" style="display:none;">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th data-col="ip"      onclick="sortTable('ip')">IP Address</th>
+                                <th data-col="status"  onclick="sortTable('status')">IP Status</th>
+                                <th data-col="score"   onclick="sortTable('score')">Score</th>
+                                <th data-col="country" onclick="sortTable('country')">Country</th>
+                                <th data-col="isp"     onclick="sortTable('isp')">ISP</th>
+                                <th data-col="domain"  onclick="sortTable('domain')">Domain</th>
+                                <th data-col="reports" onclick="sortTable('reports')">Reports</th>
+                                <th data-col="confidence" onclick="sortTable('confidence')">Confidence Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody-abuseipdb"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyState-abuseipdb" style="display:none;">
+                    <i class="bi bi-shield-x"></i>
+                    <p>No AbuseIPDB results to display.</p>
+                </div>
+            </div>
+
+            <!-- VirusTotal -->
+            <div class="tab-pane fade" id="panel-virustotal" role="tabpanel"
+                 aria-labelledby="tab-virustotal">
+                <div class="table-wrapper" id="tableWrapper-virustotal" style="display:none;">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th data-col="ip"        onclick="sortTable('ip')">IP Address</th>
+                                <th data-col="malicious" onclick="sortTable('malicious')">Malicious</th>
+                                <th data-col="suspicious" onclick="sortTable('suspicious')">Suspicious</th>
+                                <th data-col="harmless"  onclick="sortTable('harmless')">Harmless</th>
+                                <th data-col="country"   onclick="sortTable('country')">Country</th>
+                                <th data-col="network"   onclick="sortTable('network')">Network</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody-virustotal"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyState-virustotal" style="display:none;">
+                    <i class="bi bi-shield-x"></i>
+                    <p>No VirusTotal results to display.</p>
+                </div>
+            </div>
+
+            <!-- AlienVault OTX -->
+            <div class="tab-pane fade" id="panel-otx" role="tabpanel"
+                 aria-labelledby="tab-otx">
+                <div class="table-wrapper" id="tableWrapper-otx" style="display:none;">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th data-col="ip"      onclick="sortTable('ip')">IP Address</th>
+                                <th data-col="country" onclick="sortTable('country')">Country</th>
+                                <th data-col="asn"     onclick="sortTable('asn')">ASN</th>
+                                <th data-col="pulse"   onclick="sortTable('pulse')">Pulse Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody-otx"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyState-otx" style="display:none;">
+                    <i class="bi bi-shield-x"></i>
+                    <p>No AlienVault OTX results to display.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div> <!-- end #ipChecker tool section -->
+
+    <!-- -------- IP Comparison Tool Section -------- -->
+    <div id="ipCompareTool" class="tool-section" style="display:none;">
+        <div class="glass-card mb-4 fade-in">
+            <div class="card-header-custom">
+                <i class="bi bi-arrow-left-right"></i> IP Comparison Tool
+            </div>
+            <p class="compare-description">Compare two IP lists to identify common IP addresses between datasets.</p>
+
+            <div class="compare-grid">
+                <div class="compare-col">
+                    <label class="compare-label" for="compareListA">
+                        <i class="bi bi-list-ul"></i> IP List A
+                    </label>
+                    <textarea id="compareListA" class="ip-textarea compare-textarea" spellcheck="false"
+                              placeholder="Paste IP addresses here (one per line)&#10;&#10;Example:&#10;8.8.8.8&#10;1.1.1.1&#10;45.142.122.3"></textarea>
+                </div>
+                <div class="compare-col">
+                    <label class="compare-label" for="compareListB">
+                        <i class="bi bi-list-ul"></i> IP List B
+                    </label>
+                    <textarea id="compareListB" class="ip-textarea compare-textarea" spellcheck="false"
+                              placeholder="Paste IP addresses here (one per line)&#10;&#10;Example:&#10;8.8.8.8&#10;192.168.1.1&#10;45.142.122.3"></textarea>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                <button id="compareBtn" class="btn-primary-glow" onclick="compareIPs()">
+                    <i class="bi bi-intersect"></i> Compare IPs
+                </button>
+                <button class="btn-outline-custom" onclick="clearCompare()">
+                    <i class="bi bi-x-circle"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Compare Stats -->
+        <div class="compare-stats-bar" id="compareStatsBar" style="display:none;">
+            <div class="compare-stat-card stat-a">
+                <div class="compare-stat-icon"><i class="bi bi-list-ul"></i></div>
+                <div class="compare-stat-info">
+                    <span class="compare-stat-value" id="statListA">0</span>
+                    <span class="compare-stat-label">List A IPs</span>
+                </div>
+            </div>
+            <div class="compare-stat-card stat-b">
+                <div class="compare-stat-icon"><i class="bi bi-list-ul"></i></div>
+                <div class="compare-stat-info">
+                    <span class="compare-stat-value" id="statListB">0</span>
+                    <span class="compare-stat-label">List B IPs</span>
+                </div>
+            </div>
+            <div class="compare-stat-card stat-match">
+                <div class="compare-stat-icon"><i class="bi bi-intersect"></i></div>
+                <div class="compare-stat-info">
+                    <span class="compare-stat-value" id="statMatches">0</span>
+                    <span class="compare-stat-label">Matches</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compare Results -->
+        <div class="glass-card fade-in" id="compareResultsCard" style="display:none;">
+            <div class="card-header-custom">
+                <i class="bi bi-check2-circle"></i> Comparison Results
+            </div>
+            <div id="compareResultsBody"></div>
+        </div>
+    </div>
+
+    <!-- -------- IP List Single-Line Converter Section -------- -->
+    <div id="ipSingleLineTool" class="tool-section" style="display:none;">
+        <div class="glass-card mb-4 fade-in">
+            <div class="card-header-custom">
+                <i class="bi bi-text-paragraph"></i> IP List for Single-Line Conversion
+            </div>
+            <p class="converter-description">
+                Paste multiple IP addresses (one per line) and convert them into a single comma-separated line for quick whitelist/blacklist rules.
+            </p>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="converter-label" for="converterInput">
+                        <i class="bi bi-list-ul"></i> Multi-line IP List
+                    </label>
+                    <textarea id="converterInput" class="ip-textarea converter-textarea" spellcheck="false"
+                              placeholder="102.135.95.19&#10;115.89.144.195&#10;45.142.122.3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="converter-label" for="converterOutput">
+                        <i class="bi bi-arrow-right-circle"></i> Single-Line Output
+                    </label>
+                    <textarea id="converterOutput" class="ip-textarea converter-textarea" spellcheck="false"
+                              placeholder="Converted single-line IPs will appear here" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                <button class="btn-primary-glow" onclick="convertIPs()">
+                    <i class="bi bi-arrow-repeat"></i> Convert to Single Line
+                </button>
+                <button class="btn-outline-custom" onclick="copySingleLine()">
+                    <i class="bi bi-clipboard-check"></i> Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- -------- Domain Intelligence Tool Section -------- -->
+    <div id="domainIntelTool" class="tool-section" style="display:none;">
+        <div class="glass-card mb-4 fade-in">
+            <div class="card-header-custom">
+                <i class="bi bi-globe"></i> Domain Intelligence Tool
+            </div>
+            <p class="converter-description">
+                Enter a domain name to retrieve basic WHOIS and DNS information for quick triage.
+            </p>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="converter-label" for="domainInput">
+                        <i class="bi bi-link-45deg"></i> Domain Name
+                    </label>
+                    <input id="domainInput" type="text" class="form-control"
+                           placeholder="example.com">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn-primary-glow w-100" onclick="lookupDomain()">
+                        <i class="bi bi-search"></i> Lookup Domain
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card fade-in" id="domainResultsCard" style="display:none;">
+            <div class="card-header-custom">
+                <i class="bi bi-journal-text"></i> Domain Intelligence Summary
+            </div>
+            <div id="domainResultsBody"></div>
+        </div>
+    </div>
+
+    <!-- -------- URL Intelligence Tool Section -------- -->
+    <div id="urlIntelTool" class="tool-section" style="display:none;">
+        <div class="glass-card mb-4 fade-in">
+            <div class="card-header-custom">
+                <i class="bi bi-link-45deg"></i> URL Intelligence Tool
+            </div>
+            <p class="converter-description">
+                Paste a URL to check its reputation using VirusTotal and AlienVault OTX URL intelligence.
+            </p>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="converter-label" for="urlInput">
+                        <i class="bi bi-link-45deg"></i> URL
+                    </label>
+                    <input id="urlInput" type="text" class="form-control"
+                           placeholder="https://example.com/login">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn-primary-glow w-100" onclick="lookupUrl()">
+                        <i class="bi bi-shield-check"></i> Check URL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card fade-in" id="urlResultsCard" style="display:none;">
+            <div class="card-header-custom">
+                <i class="bi bi-journal-text"></i> URL Intelligence Summary
+            </div>
+            <div id="urlResultsBody"></div>
+        </div>
+    </div>
+
+    <!-- -------- File Hash Intelligence Tool Section -------- -->
+    <div id="hashIntelTool" class="tool-section" style="display:none;">
+        <div class="glass-card mb-4 fade-in">
+            <div class="card-header-custom">
+                <i class="bi bi-fingerprint"></i> File Hash Intelligence Tool
+            </div>
+            <p class="converter-description">
+                Paste a file hash (MD5, SHA1, or SHA256) to retrieve malware classification and detection details from VirusTotal.
+            </p>
+
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="converter-label" for="hashInput">
+                        <i class="bi bi-fingerprint"></i> File Hash
+                    </label>
+                    <input id="hashInput" type="text" class="form-control"
+                           placeholder="44d88612fea8a8f36de82e1278abb02f">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button class="btn-primary-glow w-100" onclick="lookupHash()">
+                        <i class="bi bi-search"></i> Check File Hash
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card fade-in" id="hashResultsCard" style="display:none;">
+            <div class="card-header-custom">
+                <i class="bi bi-journal-text"></i> File Hash Intelligence Summary
+            </div>
+            <div id="hashResultsBody"></div>
+        </div>
+    </div>
+
+    </main>
+
+</div>
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="app-footer">
+    &copy; 2026 PSY9 Radar. All Rights Reserved by Yagna Modi.
+</footer>
+
+<!-- ===================== IP DETAILS MODAL ===================== -->
+<div class="modal fade" id="ipDetailsModal" tabindex="-1" aria-labelledby="ipDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content ip-modal">
+      <div class="modal-header ip-modal-header">
+        <div>
+            <h5 class="modal-title" id="ipDetailsModalLabel">IP Reputation Details</h5>
+            <small class="text-muted font-mono" id="ipDetailsSubtitle"></small>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body ip-modal-body">
+        <div id="ipDetailsContent">
+            <div class="text-center text-muted py-4">
+                <div class="spinner-border text-info mb-3" role="status"></div>
+                <div>Loading details…</div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== JS ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
