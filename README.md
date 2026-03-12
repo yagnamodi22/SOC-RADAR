@@ -132,13 +132,17 @@ http://127.0.0.1:5000
 
 ## Dashboard Preview
 
-Add screenshots of the interface here.
+### Main Dashboard
 
-Example:
+![PSY9 Radar Dashboard](screenshots/dashboard.png)
 
+### IP Reputation Checker
 
+![IP Reputation Tool](screenshots/ip-checker.png)
 
-Create a folder named `screenshots` and upload dashboard images.
+### Threat Intelligence Results
+
+![Threat Intelligence Results](screenshots/results.png)
 
 ---
 
