@@ -59,21 +59,26 @@ These services provide reputation scores, abuse reports, and contextual threat i
 
 ## Project Structure
 
-
+```
 PSY9-RADAR
 │
 ├── static
-│ ├── style.css
-│ └── script.js
+│   ├── style.css
+│   └── script.js
 │
 ├── templates
-│ └── index.html
+│   └── index.html
+│
+├── screenshots
+│   ├── dashboard.png
+│   └── ip-checker-result.png
 │
 ├── app.py
 ├── config.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+```
 
 
 ---
