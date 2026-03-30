@@ -1,4 +1,4 @@
-// PSY9 Radar — frontend controller logic
+// SOC Radar — frontend controller logic
 // Keeps UI state, calls backend routes, and renders results for each tool.
 
 // ---------------------------------------------------------------------------
