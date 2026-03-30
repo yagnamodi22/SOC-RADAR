@@ -32,7 +32,7 @@ import config
 # Logging
 # ---------------------------------------------------------------------------
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-logger = logging.getLogger("psy9-radar")
+logger = logging.getLogger("SOC-radar")
 
 # ---------------------------------------------------------------------------
 # Flask app
