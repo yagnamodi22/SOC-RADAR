@@ -1,4 +1,4 @@
-# PSY9 Radar
+# SOC Radar
 ### Where Intelligence Meets Defense
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
@@ -7,7 +7,7 @@
 ![SOC Tool](https://img.shields.io/badge/SOC-Dashboard-purple)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-PSY9 Radar is a **SOC-oriented Threat Intelligence Dashboard** built to help security analysts investigate and analyze large volumes of IP addresses quickly using multiple threat intelligence sources.
+SOC Radar is a **SOC-oriented Threat Intelligence Dashboard** built to help security analysts investigate and analyze large volumes of IP addresses quickly using multiple threat intelligence sources.
 
 The platform aggregates intelligence from **AbuseIPDB, VirusTotal, and AlienVault OTX** to detect malicious activity, classify risk levels, and assist analysts in threat triage workflows.
 
@@ -60,7 +60,7 @@ These services provide reputation scores, abuse reports, and contextual threat i
 ## Project Structure
 
 ```
-PSY9-RADAR
+SOC-RADAR
 │
 ├── static
 │   ├── style.css
@@ -88,9 +88,9 @@ PSY9-RADAR
 Clone the repository
 
 
-git clone https://github.com/yagnamodi22/PSY9-RADAR.git
+git clone https://github.com/yagnamodi22/SOC-RADAR.git
 
-cd PSY9-RADAR
+cd SOC-RADAR
 
 
 Create virtual environment
@@ -144,7 +144,7 @@ http://127.0.0.1:5000
 ## Dashboard Preview
 
 ### Main Dashboard
-![PSY9 Radar Dashboard](screenshots/dashboard.png)
+![SOC Radar Dashboard](screenshots/dashboard.png)
 
 ### IP Reputation Checker
 ![IP Reputation Tool](screenshots/ip-checker-result.png)
