@@ -1,5 +1,5 @@
 """
-PSY9 Radar configuration.
+SOC Radar configuration.
 
 For security, provide API keys via environment variables.
 """
